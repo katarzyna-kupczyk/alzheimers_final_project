@@ -80,3 +80,25 @@ create_bucket:
 
 upload_data:
 	@gsutil cp -r ${LOCAL_PATH} gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${BUCKET_FILE_NAME}
+
+run_locally:
+	@python -m ${PACKAGE_NAME}.${FILENAME}
+
+JOB_NAME=alzheimers_training_model_7_$(shell date + '%Y%m%d_%H%M%S')
+BUCKET_TRAINING_FOLDER='trainings'
+PACKAGE_NAME=alzheimers_final_project
+FILENAME=trainer
+PYTHON_VERSION=3.7
+RUNTIME_VERSION=2.3
+
+gcp_submit_training:
+	gcloud ai-platform jobs submit training ${JOB_NAME} \
+		--job-dir gs://${BUCKET_NAME}/${BUCKET_TRAINING_FOLDER} \
+		--package-path ${PACKAGE_NAME} \
+		--module-name ${PACKAGE_NAME}.${FILENAME} \
+		--python-version=${PYTHON_VERSION} \
+		--runtime-version=${RUNTIME_VERSION} \
+		--region ${REGION} \
+		--stream-logs \
+		--scale-tier CUSTOM \
+    --master-machine-type n1-standard-8

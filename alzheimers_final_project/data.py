@@ -1,12 +1,11 @@
 # Import dependencies
 from tensorflow.keras.preprocessing import image_dataset_from_directory
 from alzheimers_final_project.params import BATCH_SIZE, IMAGE_SIZE
-import tensorflow as tf
 
 
 # Insert your local path to train data and test data here:
-path_to_train_data = '/raw_data/ALzheimersDataset/train'
-path_to_test_data = '/raw_data/ALzheimersDataset/test'
+path_to_train_data = '/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/AlzheimersDataset/train'
+path_to_test_data = '/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/AlzheimersDataset/test'
 
 def train_data_loading(path_to_train_data):
 
