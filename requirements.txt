@@ -10,6 +10,8 @@ pandas
 scikit-learn
 tensorflow
 
+# Images
+PIL
 
 # tests/linter
 black
