@@ -28,8 +28,12 @@ class Trainer():
 
     def load_data(self):
         # Get and preprocess data
-        self.train_generator, self.validation_generator = train_data_loading(self.train_path)
-        self.test_generator = test_data_loading(self.test_path)
+        self.train_generator, self.validation_generator = train_data_loading('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/AlzheimersDataset/train')
+        self.test_generator = test_data_loading('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/AlzheimersDataset/test')
+
+        # self.train_generator = tf.data.experimental.load('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/tf_train', element_spec=None, compression=None, reader_func=None)
+        # self.validation_generator = tf.data.experimental.load('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/tf_validation', element_spec=None, compression=None, reader_func=None)
+        # self.test_generator = tf.data.experimental.load('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/tf_test', element_spec=None, compression=None, reader_func=None)
 
     def set_model(self):
         # Autotune the process
@@ -40,8 +44,8 @@ class Trainer():
         self.test_generator = self.test_generator.map(preprocessing, num_parallel_calls=AUTOTUNE)
 
         self.train_generator = self.train_generator.cache().prefetch(buffer_size=AUTOTUNE)
-        self.validation_generator = self.validation_generator.cache().prefetch(buffer_size=AUTOTUNE)
-        self.test_generator = self.test_generator.cache().prefetch(buffer_size=AUTOTUNE)
+        self.validation_generator = self.validation_generator.prefetch(buffer_size=AUTOTUNE)
+        self.test_generator = self.test_generator.prefetch(buffer_size=AUTOTUNE)
 
         self.model = build_compile_model()
         return self.model
@@ -68,7 +72,7 @@ class Trainer():
 ### SAVE MODEL TO GCP ###
     def save_model(self):
         """ Save the trained model into a model.joblib file """
-        joblib.dump(self.pipeline, 'model.joblib')
+        joblib.dump(self.model, 'model.joblib')
         client = storage.Client()
         bucket = client.bucket(BUCKET_NAME)
         blob = bucket.blob(STORAGE_LOCATION)
@@ -77,6 +81,7 @@ class Trainer():
 
 
 if __name__ == "__main__":
+
     t = Trainer()
 
     t.set_data()
@@ -86,3 +91,4 @@ if __name__ == "__main__":
     t.evaluate()
 
     # Train model and save to gcp
+    t.save_model()
