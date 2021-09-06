@@ -1,12 +1,10 @@
 import tensorflow as tf
-import joblib
 import os
+import pickle
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from alzheimers_final_project.data import train_data_loading, test_data_loading
-from alzheimers_final_project.params import STORAGE_LOCATION, BUCKET_NAME
 from alzheimers_final_project.model import build_compile_model
-from alzheimers_final_project.preprocess import preprocessing
-from google.cloud import storage
+from alzheimers_final_project.preprocess import preprocessing, augment
 
 
 class Trainer():
@@ -17,6 +15,7 @@ class Trainer():
         self.train_generator = None
         self.validation_generator = None
         self.test_generator = None
+        self.scores_dict = None
 
 ### MODEL PIPELINE ###
     def set_data(self):
@@ -31,15 +30,13 @@ class Trainer():
         self.train_generator, self.validation_generator = train_data_loading('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/AlzheimersDataset/train')
         self.test_generator = test_data_loading('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/AlzheimersDataset/test')
 
-        # self.train_generator = tf.data.experimental.load('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/tf_train', element_spec=None, compression=None, reader_func=None)
-        # self.validation_generator = tf.data.experimental.load('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/tf_validation', element_spec=None, compression=None, reader_func=None)
-        # self.test_generator = tf.data.experimental.load('/Users/katarzynakupczyk/code/katarzyna-kupczyk/alzheimers_final_project/raw_data/tf_test', element_spec=None, compression=None, reader_func=None)
 
     def set_model(self):
         # Autotune the process
         AUTOTUNE = tf.data.experimental.AUTOTUNE
 
         self.train_generator = self.train_generator.map(preprocessing, num_parallel_calls=AUTOTUNE)
+        self.train_generator = self.train_generator.map(augment, num_parallel_calls=AUTOTUNE)
         self.validation_generator = self.validation_generator.map(preprocessing, num_parallel_calls=AUTOTUNE)
         self.test_generator = self.test_generator.map(preprocessing, num_parallel_calls=AUTOTUNE)
 
@@ -54,31 +51,32 @@ class Trainer():
         if self.model == None:
             self.set_model()
         es = EarlyStopping(patience=10, restore_best_weights=True)
-        rop = ReduceLROnPlateau(monitor='val_loss', factor=0.005, patience=10, min_lr=0.005)
+        rop = ReduceLROnPlateau(monitor='val_auc', factor=0.005, patience=10, min_lr=0.005)
         self.model.fit(self.train_generator, validation_data=self.validation_generator, epochs=50, callbacks=[es, rop], verbose=1)
 
 
     def evaluate(self):
         """evaluates the model on test set and returns the Loss, AUC, Accuracy, Recall and Precision"""
         test_scores = self.model.evaluate(self.test_generator)
-        scores_dict = {'Loss': test_scores[0],
+        self.scores_dict = {'Loss': test_scores[0],
                        'AUC': test_scores[1],
                        'Accuracy': test_scores[2],
                        'Recall': test_scores[3],
                        'Precision': test_scores[4]}
-        return scores_dict
+        return self.scores_dict
 
 
-### SAVE MODEL TO GCP ###
-    def save_model(mod):
+### SAVE MODEL ###
+    def save_model(self, model_name):
         """ Save the trained model into a model.joblib file """
-        joblib.dump(mod, 'model.joblib')
+        self.model.save(model_name)
+        if self.scores_dict != None:
+          with open(f'{model_name}_scores.pickle', 'wb') as handle:
+            pickle.dump(self.scores_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-        # client = storage.Client()
-        # bucket = client.bucket(BUCKET_NAME)
-        # blob = bucket.blob(STORAGE_LOCATION)
-        # blob.upload_from_filename('model.joblib')
-        # print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
+
+    def load_model(self, path_to_model):
+        self.model = tf.keras.models.load_model(path_to_model)
 
 
 if __name__ == "__main__":

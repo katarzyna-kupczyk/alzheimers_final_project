@@ -4,7 +4,7 @@ COPY alzheimers_final_project /alzheimers_final_project
 COPY requirements.txt /requirements.txt
 COPY predict.py /predict.py
 COPY api /api
-COPY model.joblib /model.joblib
+COPY alz_model /alz_model
 
 
 RUN pip install --upgrade pip

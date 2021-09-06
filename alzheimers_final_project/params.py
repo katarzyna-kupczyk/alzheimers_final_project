@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.keras.optimizers import Adam
 
 ### MODEL PARAMETERS ###
 AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -7,6 +8,7 @@ IMAGE_SIZE = (224, 224)
 EPOCHS = 100
 INPUT_SHAPE = (224, 224, 3)
 METRICS = ['AUC', 'accuracy', 'Recall', 'Precision']
+OPTIMIZER = Adam(learning_rate=0.001)
 
 
 

@@ -1,14 +1,14 @@
 from PIL import Image
-import numpy as np
-import joblib
+import tensorflow as tf
 
-def preprocessing(img_path):
-    img = Image.open(img_path).convert('L').resize((224, 224), Image.ANTIALIAS)
-    img = np.array(img)
-    img_preproc = img/255
-    return img_preproc
 
-def predict(img_preproc, model_path):
-    model = joblib.load(model_path)
-    prediction = model.predict(img_preproc)
-    return prediction
+def predict_img(path_to_prediction_data):
+    image = Image.open(path_to_prediction_data).convert('RGB')
+    image_array  = tf.keras.preprocessing.image.img_to_array(image)
+    image = tf.image.resize(image_array, (224, 224))
+    image = image / 255
+    image = tf.expand_dims(image, axis = 0)
+
+    model = tf.keras.models.load_model('alz_model')
+    prediction = model.predict(image)
+    return {'prediction': prediction[0]}
