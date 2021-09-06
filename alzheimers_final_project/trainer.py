@@ -70,14 +70,15 @@ class Trainer():
 
 
 ### SAVE MODEL TO GCP ###
-    def save_model(self):
+    def save_model(mod):
         """ Save the trained model into a model.joblib file """
-        joblib.dump(self.model, 'model.joblib')
-        client = storage.Client()
-        bucket = client.bucket(BUCKET_NAME)
-        blob = bucket.blob(STORAGE_LOCATION)
-        blob.upload_from_filename('model.joblib')
-        print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
+        joblib.dump(mod, 'model.joblib')
+
+        # client = storage.Client()
+        # bucket = client.bucket(BUCKET_NAME)
+        # blob = bucket.blob(STORAGE_LOCATION)
+        # blob.upload_from_filename('model.joblib')
+        # print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
 
 
 if __name__ == "__main__":
@@ -90,5 +91,5 @@ if __name__ == "__main__":
     t.fit_model()
     t.evaluate()
 
-    # Train model and save to gcp
+    # Train model and save to joblib file
     t.save_model()
