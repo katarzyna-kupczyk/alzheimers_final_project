@@ -84,6 +84,11 @@ upload_data:
 run_locally:
 	@python -m ${PACKAGE_NAME}.${FILENAME}
 
+
+##### Prediction API #####
+run_api:
+	uvicorn api.fast:app --reload
+
 # JOB_NAME=alzheimers_training_model_7_$(shell date + '%Y%m%d_%H%M%S')
 # BUCKET_TRAINING_FOLDER='trainings'
 # PACKAGE_NAME=alzheimers_final_project
