@@ -1,11 +1,13 @@
 import tensorflow as tf
 import os
 import pickle
+import sys
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from alzheimers_final_project.data import train_data_loading, test_data_loading
 from alzheimers_final_project.model import build_compile_model
 from alzheimers_final_project.preprocess import preprocessing, augment
 
+sys.setrecursionlimit(10000)
 
 class Trainer():
     def __init__(self):
@@ -51,8 +53,8 @@ class Trainer():
         if self.model == None:
             self.set_model()
         es = EarlyStopping(patience=10, restore_best_weights=True)
-        rop = ReduceLROnPlateau(monitor='val_auc', factor=0.005, patience=10, min_lr=0.005)
-        self.model.fit(self.train_generator, validation_data=self.validation_generator, epochs=50, callbacks=[es, rop], verbose=1)
+        rop = ReduceLROnPlateau(monitor='val_auc', factor=0.01, patience=5, min_lr=0.00001)
+        self.model.fit(self.train_generator, validation_data=self.validation_generator, epochs=200, callbacks=[es, rop], verbose=1)
 
 
     def evaluate(self):
