@@ -68,7 +68,7 @@ class Trainer():
 
 ### SAVE MODEL ###
     def save_model(self, model_name):
-        """ Save the trained model into a model.joblib file """
+        """ Save the trained model into folder """
         self.model.save(model_name)
         if self.scores_dict != None:
           with open(f'{model_name}_scores.pickle', 'wb') as handle:
@@ -89,5 +89,5 @@ if __name__ == "__main__":
     t.fit_model()
     t.evaluate()
 
-    # Train model and save to joblib file
+    # Train model and save
     t.save_model()
