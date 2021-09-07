@@ -22,7 +22,6 @@ uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image.', use_column_width=True)
-    st.write("")
 
 
 
@@ -50,7 +49,10 @@ def medical_report():
     st.write('Date of Birth: ', dob)
     st.write('Report Date:' , report_date)
     st.write('Examination: MRI')
-    st.write(report(classification))
+    st.write('Result: ',real_classification)
+    report(real_classification)
+    # st.text(' ')
+
 
 
 def predict_img(path_to_prediction_data):
@@ -60,7 +62,7 @@ def predict_img(path_to_prediction_data):
     image = image / 255
     image = tf.expand_dims(image, axis = 0)
 
-    model = tf.keras.models.load_model('alz_model')
+    model = tf.keras.models.load_model('alz_model_h5.h5')
     prediction = model.predict(image)
     prediction_array = prediction[0]
     max_value = np.max(prediction_array)
@@ -78,5 +80,6 @@ def predict_img(path_to_prediction_data):
 if st.button('Generate Report'):
     st.write("Classifying...")
     classification = predict_img(uploaded_file)
+    real_classification = classification['prediction']
     print(classification)
     result = medical_report()

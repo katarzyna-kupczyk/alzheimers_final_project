@@ -14,7 +14,7 @@ def predict_img(path_to_prediction_data):
     image = image / 255
     image = tf.expand_dims(image, axis = 0)
     print(image)
-    model = tf.keras.models.load_model('alz_model')
+    model = tf.keras.models.load_model('alz_model_h5.h5')
     print(model)
     prediction = model.predict(image)
     prediction_array = prediction[0]
