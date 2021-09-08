@@ -12,4 +12,4 @@ COPY requirements.txt /requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-CMD streamlit run app.py  --server.port 8080
+CMD streamlit run app.py  --server.port 8501
