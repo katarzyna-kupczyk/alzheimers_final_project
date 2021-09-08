@@ -1,6 +1,6 @@
 import streamlit as st
 from multipage import MultiPage
-from pages import home, prediction, tech
+from pages import prediction, techinfo
 
 # Creating an instance of the app
 app = MultiPage()
@@ -9,9 +9,8 @@ app = MultiPage()
 st.title("Detecting Stages of Alzheimer's Disease with Deep Learning")
 
 # All pages here
-app.add_page("Home", home.app)
 app.add_page("Prediction", prediction.app)
-app.add_page("Tech Stack", tech.app)
+app.add_page("Technical Info", techinfo.app)
 
 # Running the main app
 app.run()
