@@ -1,0 +1,4 @@
+raw_data/
+*.egg-info
+.coverage
+.ipynb_checkpoints
